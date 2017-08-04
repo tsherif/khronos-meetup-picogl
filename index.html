@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">  
+<head>
+  <meta charset="utf-8">
+  <title>WebGL 2 Development with PicoGL.js</title>
+  <link rel="stylesheet" href="css/reveal.min.css">
+  <link rel="stylesheet" href="css/theme/default.css" id="theme"> 
+  <link rel="stylesheet" href="plugin/highlight/styles/docco.css"> 
+  <link rel="icon" type="image/png" href="img/WebGL.png">
+  <style>
+
+    .reveal .slide-number {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .reveal section img {
+      max-height: 400px;
+    }
+
+    .reveal pre {
+      box-shadow: none;
+    }
+
+    .reveal .me {
+      margin-top: 42px;
+    }
+
+    .reveal ul ul {
+      font-size: 0.8em;
+    }
+
+    iframe {
+      width: 100%;
+      height: 12em;
+    }
+
+    .reveal section a.example-menu-button {
+        display: inline-block;
+        background-color: gray;
+        color: white;
+        text-decoration: none;
+        padding: 0.2em;
+        font-size: 0.7em;
+        margin: 0.4em 0.2em;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <section>
+        <h1>WebGL 2 Development with PicoGL.js</h1>
+        <p>Tarek Sherif</p>
+        <p>BioDigital</p>
+      </section>
+
+      <section>
+        <h2>BioDigital</h2>
+        <ul>
+          <li>Big, high-detail anatomy visualizations</li>
+          <li>
+            Our male base anatomy contains: 
+            <ul>
+              <li>2230 objects</li>
+              <li>3.3 million triangles</li>
+            </ul>
+          </li>
+        </ul>
+        <img src="img/human.png">
+      </section>
+
+      <section>
+        <h2>BioDigital</h2>
+        <ul>
+          <li>
+            Things we're excited about in WebGL 2:
+            <ul>
+              <li>UBOs</li>
+              <li>Instanced drawing</li>
+              <li>Occlusion queries</li>
+              <li>(i.e. reduce number of draws/draw overhead)</li>
+            </ul>
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>WebGL 2 is a BIG Update</h2>
+        <ul>
+          <li>New shading language</li>
+          <li>Uniform buffer objects</li>
+          <li>Transform feedback</li>
+          <li>Query objects</li>
+          <li>Multiple render targets</li>
+          <li>etc, etc, etc... </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>How to get started?</h2>
+        <img src="img/rube-webgl.gif">
+      </section>
+      <!-- Image src: https://en.wikipedia.org/wiki/Rube_Goldberg_machine#/media/File:Rube_Goldberg%27s_%22Self-Operating_Napkin%22_(cropped).gif -->
+
+      <section>
+        <h2>PicoGL.js</h2>
+        <ul>
+          <li>
+            Just simplify management of the rendering layer
+            <ul>
+              <li>No math, scene graph, physics, etc.</li>
+            </ul>
+          </li>
+          <li>
+            User manipulates GL constructs
+            <ul>
+              <li>Programs, VAOs, UBOs, transform feedbacks, queries, etc.</li>
+            </ul>
+          </li>
+          <li>
+            PicoGL.js just provides a friendly API, helps with layout and works around implementation bugs
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>PicoGL.js 101</h2>
+            <pre>
+                <code class="javascript">
+  // App manages global GL state
+  var app = PicoGL.createApp(canvas)
+  .clearColor(0.0, 0.0, 0.0, 1.0);
+  
+  // Program, VBO, VAO
+  var program = app.createProgram(vertexShaderSource, fragmentShaderSource);
+  var positions = app.createVertexBuffer(PicoGL.FLOAT, 2, positionData);
+  var vertexArray = app.createVertexArray()
+  .vertexAttributeBuffer(0, positions);
+
+  // Draw call manages per-draw state
+  var drawCall = app.createDrawCall(program, vertexArray);
+
+  app.clear();
+  drawCall.draw();
+              </code>
+            </pre>
+      </section>
+
+      <section>
+        <h2>Vertex Array Objects</h2>
+        <div>
+          In WebGL 1, you had to bind each buffer set its attribute pointer for each frame
+        </div>
+        <pre>
+          <code class="javascript">
+function draw() {
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+    gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(1);  
+
+    // Etc...
+
+    gl.drawArrays(gl.TRIANGLES, 0, numVertices);
+
+    requestAnimationFrame(draw);
+}
+          </code>
+        </pre>
+      </section>
+
+     <section>
+        <h2>Vertex Array Objects</h2>
+        <div>
+          In WebGL 2, you bind buffers and pointer state to a vertex array, and then just bind 
+          the vertex array on each frame
+        </div>
+        <pre>
+          <code class="javascript">
+gl.bindVertexArray(vertexArray);
+gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
+gl.enableVertexAttribArray(0);
+
+gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 0, 0);
+gl.enableVertexAttribArray(1);  
+gl.bindVertexArray(null);
+
+function draw() {
+    gl.bindVertexArray(vertexArray);
+    gl.drawArrays(gl.TRIANGLES, 0, numVertices);
+
+    requestAnimationFrame(draw);
+}
+          </code>
+        </pre>
+      </section>
+
+       <section>
+        <h2>Vertex Array Objects</h2>
+        <div>
+          PicoGL.js is handles most of the binding and pointer set up for us
+        </div>
+        <pre>
+          <code class="javascript">
+var boxArray = app.createVertexArray()
+.attributeBuffer(0, positions)
+.attributeBuffer(1, normals);
+
+app.createDrawCall(program, boxArray);
+
+function draw() {
+    drawCall.draw()
+
+    requestAnimationFrame(draw);
+}
+          </code>
+        </pre>
+      </section>
+
+      <section>
+        <h2>Raw Uniform Buffer Objects</h2>
+            <pre>
+                <code class="javascript">
+  var uniformsLocation = gl.getUniformBlockIndex(program, "myUniforms");
+  gl.uniformBlockBinding(program, uniformsLocation, 0);
+
+  // HAVE TO KNOW STD140 LAYOUT!!!
+  var uboData = new Float32Array(24);
+  uboData.set(viewProjMatrix);
+  uboData.set(eyePosition, 16);
+  uboData.set(lightPosition, 20);
+
+  var uniformBuffer = gl.createBuffer();
+  gl.bindBufferBase(gl.UNIFORM_BUFFER, 0, uniformBuffer);
+  gl.bufferData(gl.UNIFORM_BUFFER, uboData, gl.STATIC_DRAW);
+              </code>
+            </pre>
+      </section>
+
+            <section>
+        <h2>PicoGL.js Uniform Buffer Objects</h2>
+            <pre>
+                <code class="javascript">
+  // PicoGL.js handles layout.
+  var uniformBuffer = app.createUniformBuffer([
+      PicoGL.FLOAT_MAT4,
+      PicoGL.FLOAT_VEC4,
+      PicoGL.FLOAT_VEC4
+  ])
+  .set(0, viewProjMatrix)
+  .set(1, eyePosition)
+  .set(2, lightPosition)
+  .update();
+
+  drawCall.uniformBlock("myUniforms", uniformBuffer);
+              </code>
+            </pre>
+      </section>
+
+      <section>
+        <h2>Examples</h2>
+        <a href="#" class="example-menu-button" id="dof">Depth of Field</a>
+        <a href="#" class="example-menu-button" id="oit">Order-independent Transprency</a>
+        <a href="#" class="example-menu-button" id="occlusion">Occlusion Culling</a>
+        <a href="#" class="example-menu-button" id="cloth">Cloth</a>
+        <iframe id="examples" src="picogl/examples/dof.html"></iframe>
+        <script>
+            var exampleFrame = document.getElementById("examples");
+
+            document.body.addEventListener("click", function(event) {
+                if (event.target.className !== "example-menu-button") {
+                    return;
+                }
+
+                var link = event.target;
+                var src = "picogl/examples/" + event.target.id + ".html";
+
+                examples.src = src;
+
+                event.stopPropagation();
+                event.preventDefault();
+            });
+
+        </script>
+      </section>
+
+      <section>
+        <h2>Thanks!</h2>
+        <div>Some Resources:</div>
+        <ul>
+          <li>Website: <a target="_blank" href="https://tsherif.github.io/picogl.js/">tsherif.github.io/picogl.js/</a></li>
+          <li>GitHub: <a target="_blank" href="https://github.com/tsherif/picogl.js">github.com/tsherif/picogl.js</a></li>
+          <li>Twitter: <a target="_blank" href="https://twitter.com/thsherif">@thsherif</a></li>
+          <li>Email: <a href="mailto:tarek@biodigital.com">tarek@biodigital.com</a></li>
+        </ul>
+      </section>
+    </div>
+  </div>
+  <script src="lib/js/head.min.js"></script>
+  <script src="js/reveal.min.js"></script>
+  <script src="js/highlight.min.js"></script>
+  <script>
+    Reveal.initialize({
+      history: true,
+      slideNumber: true,
+      controls: false
+    });
+
+    Reveal.addEventListener("slidechanged", function(event) {
+      window.onresize();
+    });
+
+    hljs.initHighlightingOnLoad();
+    
+  </script>
+</body>
+</html>
