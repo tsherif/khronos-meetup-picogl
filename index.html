@@ -286,16 +286,16 @@
           <h2>Instanced Drawing</h2>
           <ul>
               <li>
-                It's to draw the same geometry multiple times, while changing uniform values
+                It's common to draw the same geometry multiple times while changing uniform values
                 <ul>
                     <li>E.g. transform, color</li>
                 </ul>
               </li>
               <li>
-                  In WebGL 1, you have to iterate over these objects and draw them individually
+                  In WebGL 1, you have to iterate over each object and draw it individually
               </li>
               <li>
-                  In WebGL 2, you can draw them in a single draw call
+                  In WebGL 2, you can draw objects that share geometry in a single draw call
               </li>
           </ul>
       </section>
@@ -352,7 +352,8 @@
           </div>
           <ul>
               <li>Reduced CPU overhead for drawing instances</li>
-              <li><a target="_blank" href="https://tsherif.github.io/picogl.js/examples/125kcubes.html">125,000 Cubes</a></li>
+              <li><a target="_blank" href="https://tsherif.github.io/picogl.js/examples/64kcubes.html">64,000 Cubes</a></li>
+              <li><a target="_blank" href="https://tsherif.github.io/picogl.js/examples/125kcubes.html">125,000 Cubes</a> (with transform feedback)</li>
           </ul>
       </section>
 
@@ -393,14 +394,12 @@
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBufferB);
   gl.bufferData(gl.ARRAY_BUFFER, positionData.byteLength, gl.STREAM_COPY);
 
-  var transformFeedback = gl.createTransformFeedback();
-  gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, transformFeedback);
-  gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 0, positionBufferB);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBufferA);
   gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(0);
-  gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, transformFeedback);
+
+  gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 0, positionBufferB);
 
   gl.beginTransformFeedback(gl.TRIANGLES);
   gl.drawArrays(gl.TRIANGLES, 0, numVertices);
