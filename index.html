@@ -67,43 +67,15 @@
       </section>
 
       <section>
-        <h2>BioDigital</h2>
-        <ul>
-          <li>Big, high-detail anatomy visualizations</li>
-          <li>
-            Our male base anatomy contains: 
-            <ul>
-              <li>2230 objects</li>
-              <li>3.3 million triangles</li>
-            </ul>
-          </li>
-        </ul>
-        <img src="img/human.png">
-      </section>
-
-      <section>
-        <h2>BioDigital</h2>
-        <ul>
-          <li>
-            Things we're excited about in WebGL 2:
-            <ul>
-              <li>UBOs</li>
-              <li>Instanced drawing</li>
-              <li>Occlusion queries</li>
-              <li>(i.e. reduce number of draws/draw overhead)</li>
-            </ul>
-          </li>
-        </ul>
-      </section>
-
-      <section>
         <h2>WebGL 2 is a BIG Update</h2>
         <ul>
           <li>New shading language</li>
+          <li>Vertex array objects</li>
           <li>Uniform buffer objects</li>
+          <li>Instanced drawing/li>
           <li>Transform feedback</li>
-          <li>Query objects</li>
           <li>Multiple render targets</li>
+          <li>Query objects</li>
           <li>etc, etc, etc... </li>
         </ul>
       </section>
@@ -170,9 +142,9 @@
             </ul>
           </li>
           <li>
-            In WebGL 2, you bind your buffers to and set up pointers on a vertex array object (VAO)
+            In WebGL 2, you bind your buffers and set up pointers on a vertex array object (VAO)
             <ul>
-                <li>Then for each frame you just bind the VAO</li>
+                <li>Then for each frame, you just bind the VAO</li>
             </ul>
           </li>
         </ul>
@@ -181,26 +153,26 @@
      <section>
         <h2>Vertex Array Objects</h2>
         <div>
-          What this looks like in raw WebGL 2:
+          In raw WebGL 2:
         </div>
         <pre>
           <code class="javascript">
-gl.bindVertexArray(vertexArray);
-gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
-gl.enableVertexAttribArray(0);
-
-gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
-gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 0, 0);
-gl.enableVertexAttribArray(1);  
-gl.bindVertexArray(null);
-
-function draw() {
-    gl.bindVertexArray(vertexArray);
-    gl.drawArrays(gl.TRIANGLES, 0, numVertices);
-
-    requestAnimationFrame(draw);
-}
+  gl.bindVertexArray(vertexArray);
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+  gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(0);
+  
+  gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+  gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(1);  
+  gl.bindVertexArray(null);
+  
+  function draw() {
+      gl.bindVertexArray(vertexArray);
+      gl.drawArrays(gl.TRIANGLES, 0, numVertices);
+  
+      requestAnimationFrame(draw);
+  }
           </code>
         </pre>
       </section>
@@ -208,27 +180,27 @@ function draw() {
        <section>
         <h2>Vertex Array Objects</h2>
         <div>
-          What this looks like in PicoGL.js:
+          In PicoGL.js:
         </div>
         <pre>
           <code class="javascript">
-var boxArray = app.createVertexArray()
-.attributeBuffer(0, positions)
-.attributeBuffer(1, normals);
-
-app.createDrawCall(program, boxArray);
-
-function draw() {
-    drawCall.draw()
-
-    requestAnimationFrame(draw);
-}
+  var vertexArray = app.createVertexArray()
+  .attributeBuffer(0, positions)
+  .attributeBuffer(1, normals);
+  
+  app.createDrawCall(program, vertexArray);
+  
+  function draw() {
+      drawCall.draw()
+  
+      requestAnimationFrame(draw);
+  }
           </code>
         </pre>
       </section>
 
       <section>
-        <h2></h2>
+        <h2>Uniform Buffer Objects</h2>
         <ul>
           <li>
             In WebGL 1, you have to update each uniform individually by sending data to the GPU.
@@ -246,7 +218,7 @@ function draw() {
       <section>
         <h2>Uniform Buffer Objects</h2>
         <div>
-            What this looks like in raw WebGL 2:
+            In raw WebGL 2:
         </div>
             <pre>
                 <code class="javascript">
@@ -269,7 +241,7 @@ function draw() {
     <section>
         <h2>Uniform Buffer Objects</h2>
         <div>
-            What this looks like in PicoGL.js:
+            In PicoGL.js:
         </div>
             <pre>
                 <code class="javascript">
@@ -293,7 +265,7 @@ function draw() {
           <h2>Instanced Drawing</h2>
           <ul>
               <li>
-                It's very common in 3D rendering to draw the same geometry multiple times, while changing uniform values
+                It's to draw the same geometry multiple times, while changing uniform values
                 <ul>
                     <li>E.g. transform, color</li>
                 </ul>
@@ -310,7 +282,7 @@ function draw() {
       <section>
         <h2>Instanced Drawing</h2>
         <div>
-            What this looks like in raw WebGL 2:
+            In raw WebGL 2:
         </div>
             <pre>
                 <code class="javascript">
@@ -335,7 +307,7 @@ function draw() {
       <section>
         <h2>Instanced Drawing</h2>
         <div>
-            What this looks like in PicoGl.js:
+            In PicoGl.js:
         </div>
             <pre>
                 <code class="javascript">
@@ -356,7 +328,7 @@ function draw() {
           <h2>Transform Feedback</h2>
           <ul>
             <li>
-                Capture out put from a run of the vertex shader to use as input
+                Capture output from the vertex shader to use as input
                 for the next frame    
             </li>
             <li>
@@ -371,7 +343,7 @@ function draw() {
             <section>
         <h2>Transform Feedback</h2>
         <div>
-            What this looks like in raw WebGL 2:
+            In raw WebGL 2:
         </div>
             <pre>
                 <code class="javascript">
@@ -387,7 +359,7 @@ function draw() {
 
   var positionBufferB = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBufferB);
-  gl.bufferData(gl.ARRAY_BUFFER, positionData.length * 4, gl.STREAM_COPY);
+  gl.bufferData(gl.ARRAY_BUFFER, positionData.byteLength, gl.STREAM_COPY);
 
   var transformFeedback = gl.createTransformFeedback();
   gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, transformFeedback);
@@ -408,7 +380,7 @@ function draw() {
       <section>
         <h2>Transform Feedback</h2>
         <div>
-            What this looks like in PicoGl.js:
+            In PicoGl.js:
         </div>
             <pre>
                 <code class="javascript">
@@ -421,7 +393,7 @@ function draw() {
   .vertexAttributeBuffer(0, positionBufferA)
   
   var transformFeedback = app.createTransformFeedback()
-  .feedbackBuffer(positionBufferB);
+  .feedbackBuffer(0, positionBufferB);
 
   var drawCall = app.createDrawCall(program, vertexArray)
   .transformFeedback(transformFeedback);
@@ -442,7 +414,7 @@ function draw() {
       <section>
         <h2>Transform Feedback</h2>
         <div>
-            What this looks like in raw WebGL 2:
+            In raw WebGL 2:
         </div>
             <pre>
                 <code class="javascript">
@@ -472,7 +444,7 @@ function draw() {
       <section>
         <h2>Transform Feedback</h2>
         <div>
-            What this looks like in PicoGL.js:
+            In PicoGL.js:
         </div>
             <pre>
                 <code class="javascript">
