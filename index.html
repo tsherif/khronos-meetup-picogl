@@ -45,6 +45,15 @@
         margin: 0.4em 0.2em;
     }
 
+    .reveal pre code {
+        max-height: 500px;
+    }
+
+    .reveal pre {
+        margin-left: -10%;
+        width: 120%;
+    }
+
   </style>
 </head>
 
@@ -151,35 +160,28 @@
 
       <section>
         <h2>Vertex Array Objects</h2>
-        <div>
-          In WebGL 1, you had to bind each buffer set its attribute pointer for each frame
-        </div>
-        <pre>
-          <code class="javascript">
-function draw() {
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-    gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(0);
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
-    gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(1);  
-
-    // Etc...
-
-    gl.drawArrays(gl.TRIANGLES, 0, numVertices);
-
-    requestAnimationFrame(draw);
-}
-          </code>
-        </pre>
+        <ul>
+          <li>
+            In WebGL 1, to manage geometry for each frame you have to:
+            <ul>
+                <li>Bind your buffers</li>
+                <li>Set up the vertex attribute pointer</li>
+                <li>Enable the vertex array</li>
+            </ul>
+          </li>
+          <li>
+            In WebGL 2, you bind your buffers to and set up pointers on a vertex array object (VAO)
+            <ul>
+                <li>Then for each frame you just bind the VAO</li>
+            </ul>
+          </li>
+        </ul>
       </section>
 
      <section>
         <h2>Vertex Array Objects</h2>
         <div>
-          In WebGL 2, you bind buffers and pointer state to a vertex array, and then just bind 
-          the vertex array on each frame
+          What this looks like in raw WebGL 2:
         </div>
         <pre>
           <code class="javascript">
@@ -206,7 +208,7 @@ function draw() {
        <section>
         <h2>Vertex Array Objects</h2>
         <div>
-          PicoGL.js is handles most of the binding and pointer set up for us
+          What this looks like in PicoGL.js:
         </div>
         <pre>
           <code class="javascript">
@@ -226,7 +228,26 @@ function draw() {
       </section>
 
       <section>
-        <h2>Raw Uniform Buffer Objects</h2>
+        <h2></h2>
+        <ul>
+          <li>
+            In WebGL 1, you have to update each uniform individually by sending data to the GPU.
+          </li>
+          <li>
+            In WebGL 2, you can store all your uniform values in a uniform buffer object and then just bind it
+            to update all uniform values at once.
+            <ul>
+                <li>WARNING: To do this manually, you have to align uniform variables in buffer memory according to the STD140 layout!</li>
+            </ul>
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Uniform Buffer Objects</h2>
+        <div>
+            What this looks like in raw WebGL 2:
+        </div>
             <pre>
                 <code class="javascript">
   var uniformsLocation = gl.getUniformBlockIndex(program, "myUniforms");
@@ -245,8 +266,11 @@ function draw() {
             </pre>
       </section>
 
-            <section>
-        <h2>PicoGL.js Uniform Buffer Objects</h2>
+    <section>
+        <h2>Uniform Buffer Objects</h2>
+        <div>
+            What this looks like in PicoGL.js:
+        </div>
             <pre>
                 <code class="javascript">
   // PicoGL.js handles layout.
@@ -266,30 +290,208 @@ function draw() {
       </section>
 
       <section>
+          <h2>Instanced Drawing</h2>
+          <ul>
+              <li>
+                It's very common in 3D rendering to draw the same geometry multiple times, while changing uniform values
+                <ul>
+                    <li>E.g. transform, color</li>
+                </ul>
+              </li>
+              <li>
+                  In WebGL 1, you have to iterate over these objects and draw them individually
+              </li>
+              <li>
+                  In WebGL 2, you can draw them in a single draw call
+              </li>
+          </ul>
+      </section>
+
+      <section>
+        <h2>Instanced Drawing</h2>
+        <div>
+            What this looks like in raw WebGL 2:
+        </div>
+            <pre>
+                <code class="javascript">
+  var positionBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER,  positionData, gl.STATIC_DRAW);
+  gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(0);
+  
+  var colorBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER,  colorData, gl.STATIC_DRAW);
+  gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(1);
+  gl.vertexAttribDivisor(1, 1);
+  
+  gl.drawArraysInstanced(gl.TRIANGLES, 0, numVertices, numInstances);
+              </code>
+            </pre>
+      </section>
+
+      <section>
+        <h2>Instanced Drawing</h2>
+        <div>
+            What this looks like in PicoGl.js:
+        </div>
+            <pre>
+                <code class="javascript">
+  var positionBuffer = app.createVertexBuffer(PicoGL.FLOAT, 3, positionData);
+  var colorBuffer = app.createVertexBuffer(PicoGL.FLOAT, 3, colorData);
+  
+  var vertexArray = app.createVertexArray()
+  .vertexAttributeBuffer(0, positionBuffer)
+  .instanceAttributeBuffer(1, colorBuffer);
+
+  var drawCall = app.createDrawCall(program, vertexArray);
+  drawCall.draw();
+              </code>
+            </pre>
+      </section>
+
+      <section>
+          <h2>Transform Feedback</h2>
+          <ul>
+            <li>
+                Capture out put from a run of the vertex shader to use as input
+                for the next frame    
+            </li>
+            <li>
+                Not available in WebGL 1
+                <ul>
+                    <li>(Can be emulated by writing vertex shader output to float textures)</li>
+                </ul>
+            </li>
+          </ul>
+      </section>
+
+            <section>
+        <h2>Transform Feedback</h2>
+        <div>
+            What this looks like in raw WebGL 2:
+        </div>
+            <pre>
+                <code class="javascript">
+  var program = gl.createProgram();
+  gl.attachShader(program, vertexShader);
+  gl.attachShader(program, fragmentShader);
+  gl.transformFeedbackVaryings(program, ["vPosition"], gl.SEPARATE_ATTRIBS);
+  gl.linkProgram(program);
+
+  var positionBufferA = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBufferA);
+  gl.bufferData(gl.ARRAY_BUFFER, positionData, gl.STREAM_COPY);
+
+  var positionBufferB = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBufferB);
+  gl.bufferData(gl.ARRAY_BUFFER, positionData.length * 4, gl.STREAM_COPY);
+
+  var transformFeedback = gl.createTransformFeedback();
+  gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, transformFeedback);
+  gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 0, positionBufferB);
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBufferA);
+  gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(0);
+  gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, transformFeedback);
+
+  gl.beginTransformFeedback(gl.TRIANGLES);
+  gl.drawArrays(gl.TRIANGLES, 0, numVertices);
+  gl.endTransformFeedback();
+              </code>
+            </pre>
+      </section>
+
+      <section>
+        <h2>Transform Feedback</h2>
+        <div>
+            What this looks like in PicoGl.js:
+        </div>
+            <pre>
+                <code class="javascript">
+  var program = app.createProgram(vertexShader, fragmentShader, ["vPosition"]);
+  
+  var positionBufferA = app.createVertexBuffer(PicoGL.FLOAT, 3, positionData);
+  var positionBufferB = app.createVertexBuffer(PicoGL.FLOAT, 3, positionData.length);
+  
+  var vertexArray = app.createVertexArray()
+  .vertexAttributeBuffer(0, positionBufferA)
+  
+  var transformFeedback = app.createTransformFeedback()
+  .feedbackBuffer(positionBufferB);
+
+  var drawCall = app.createDrawCall(program, vertexArray)
+  .transformFeedback(transformFeedback);
+
+  drawCall.draw();
+              </code>
+            </pre>
+      </section>
+
+      <section>
+          <h2>Multiple Render Targets</h2>
+          <ul>
+              <li>In WebGL 1, you have to do a separate draw call for every framebuffer target you want to draw to</li>
+              <li>In WebGL 2, you can bind multiple targets to a single framebuffer and draw to all of them in one draw call</li>
+          </ul>
+      </section>
+
+      <section>
+        <h2>Transform Feedback</h2>
+        <div>
+            What this looks like in raw WebGL 2:
+        </div>
+            <pre>
+                <code class="javascript">
+  var framebuffer = gl.createFramebuffer();
+  gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+  
+  var target1 = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, target1);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+  gl.texStorage2D(gl.TEXTURE_2D, 1, gl.RGBA8, gl.drawingBufferWidth, gl.drawingBufferHeight);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, target1, 0);
+  
+  var target2 = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, target2);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+  gl.texStorage2D(gl.TEXTURE_2D, 1, gl.RGBA8, gl.drawingBufferWidth, gl.drawingBufferHeight);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT1, gl.TEXTURE_2D, target2, 0);
+  
+  gl.drawBuffers([
+      gl.COLOR_ATTACHMENT0,
+      gl.COLOR_ATTACHMENT1
+  ]);
+              </code>
+            </pre>
+      </section>
+
+      <section>
+        <h2>Transform Feedback</h2>
+        <div>
+            What this looks like in PicoGL.js:
+        </div>
+            <pre>
+                <code class="javascript">
+  var framebuffer = app.createFramebuffer()
+  .colorTarget(0)
+  .colorTarget(1);
+              </code>
+            </pre>
+      </section>
+
+      <section>
         <h2>Examples</h2>
-        <a href="#" class="example-menu-button" id="dof">Depth of Field</a>
-        <a href="#" class="example-menu-button" id="oit">Order-independent Transprency</a>
-        <a href="#" class="example-menu-button" id="occlusion">Occlusion Culling</a>
-        <a href="#" class="example-menu-button" id="cloth">Cloth</a>
-        <iframe id="examples" src="picogl/examples/dof.html"></iframe>
-        <script>
-            var exampleFrame = document.getElementById("examples");
-
-            document.body.addEventListener("click", function(event) {
-                if (event.target.className !== "example-menu-button") {
-                    return;
-                }
-
-                var link = event.target;
-                var src = "picogl/examples/" + event.target.id + ".html";
-
-                examples.src = src;
-
-                event.stopPropagation();
-                event.preventDefault();
-            });
-
-        </script>
+        <ul>
+            <li><a target="_blank" href="https://tsherif.github.io/picogl.js/examples/dof.html">Depth of Field</a></li>
+            <li><a target="_blank" href="https://tsherif.github.io/picogl.js/examples/particles.html">Particles</a></li>
+            <li><a target="_blank" href="https://tsherif.github.io/picogl.js/examples/motion-blur.html">Motion Blur</a></li>
+            <li><a target="_blank" href="https://tsherif.github.io/picogl.js/examples/125kcubes.html">125,000 Cubes</a></li>
+            <li><a target="_blank" href="https://tsherif.github.io/picogl.js/examples/cloth.html">Cloth</a></li>
+        </ul>
       </section>
 
       <section>
