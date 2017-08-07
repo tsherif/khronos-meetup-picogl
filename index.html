@@ -200,6 +200,17 @@
       </section>
 
       <section>
+          <h2>Vertex Array Objects</h2>
+          <div>
+              Why do you care?
+          </div>
+          <ul>
+              <li>Reduces CPU overhead per draw call</li>
+              <li>Generally simplifies code</li>
+          </ul>
+      </section>
+
+      <section>
         <h2>Uniform Buffer Objects</h2>
         <ul>
           <li>
@@ -259,6 +270,16 @@
   drawCall.uniformBlock("myUniforms", uniformBuffer);
               </code>
             </pre>
+      </section>
+
+      <section>
+          <h2>Uniform Buffer Objects</h2>
+          <div>
+              Why do you care?
+          </div>
+          <ul>
+              <li>Can significantly reduce overhead for updating uniforms</li>
+          </ul>
       </section>
 
       <section>
@@ -322,6 +343,17 @@
   drawCall.draw();
               </code>
             </pre>
+      </section>
+
+      <section>
+          <h2>Instanced Drawing</h2>
+          <div>
+              Why do you care?
+          </div>
+          <ul>
+              <li>Reduced CPU overhead for drawing instances</li>
+              <li><a target="_blank" href="https://tsherif.github.io/picogl.js/examples/125kcubes.html">125,000 Cubes</a></li>
+          </ul>
       </section>
 
       <section>
@@ -404,6 +436,19 @@
       </section>
 
       <section>
+          <h2>Transform feedback</h2>
+          <div>
+              Why do you care?
+          </div>
+          <ul>
+              <li>Allows you to push animation logic to the GPU</li>
+              <li>Major win for animations</li>
+              <li><a target="_blank" href="https://tsherif.github.io/picogl.js/examples/particles.html">Particle System</a></li>
+              <li><a target="_blank" href="https://tsherif.github.io/picogl.js/examples/wandering-triangles.html">Wandering Triangles</a></li>
+          </ul>
+      </section>
+
+      <section>
           <h2>Multiple Render Targets</h2>
           <ul>
               <li>In WebGL 1, you have to do a separate draw call for every framebuffer target you want to draw to</li>
@@ -412,7 +457,7 @@
       </section>
 
       <section>
-        <h2>Transform Feedback</h2>
+        <h2>Multiple Render Targets</h2>
         <div>
             In raw WebGL 2:
         </div>
@@ -442,7 +487,7 @@
       </section>
 
       <section>
-        <h2>Transform Feedback</h2>
+        <h2>Multiple Render Targets</h2>
         <div>
             In PicoGL.js:
         </div>
@@ -456,12 +501,23 @@
       </section>
 
       <section>
-        <h2>Examples</h2>
+          <h2>Multiple Render Targets</h2>
+          <div>
+              Why do you care?
+          </div>
+          <ul>
+              <li>Much more efficient post-processing pipelines</li>
+              <li><a target="_blank" href="https://tsherif.github.io/picogl.js/examples/deferred.html">Deferred Renderer</a></li>
+              <li><a target="_blank" href="https://tsherif.github.io/picogl.js/examples/ssao.html">Screen Space Ambient Occlusion</a></li>
+              <li><a target="_blank" href="https://tsherif.github.io/picogl.js/examples/motion-blur.html">Motion Blur</a></li>
+          </ul>
+      </section>
+
+      <section>
+        <h2>Other Examples</h2>
         <ul>
             <li><a target="_blank" href="https://tsherif.github.io/picogl.js/examples/dof.html">Depth of Field</a></li>
-            <li><a target="_blank" href="https://tsherif.github.io/picogl.js/examples/particles.html">Particles</a></li>
-            <li><a target="_blank" href="https://tsherif.github.io/picogl.js/examples/motion-blur.html">Motion Blur</a></li>
-            <li><a target="_blank" href="https://tsherif.github.io/picogl.js/examples/125kcubes.html">125,000 Cubes</a></li>
+            <li><a target="_blank" href="https://tsherif.github.io/picogl.js/examples/occlusion.html">Occlusion Culling</a></li>
             <li><a target="_blank" href="https://tsherif.github.io/picogl.js/examples/cloth.html">Cloth</a></li>
         </ul>
       </section>
