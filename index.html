@@ -72,7 +72,7 @@
           <li>New shading language</li>
           <li>Vertex array objects</li>
           <li>Uniform buffer objects</li>
-          <li>Instanced drawing/li>
+          <li>Instanced drawing</li>
           <li>Transform feedback</li>
           <li>Multiple render targets</li>
           <li>Query objects</li>
@@ -185,8 +185,8 @@
         <pre>
           <code class="javascript">
   var vertexArray = app.createVertexArray()
-  .attributeBuffer(0, positions)
-  .attributeBuffer(1, normals);
+  .attributeBuffer(0, positionBuffer)
+  .attributeBuffer(1, normalBuffer);
   
   app.createDrawCall(program, vertexArray);
   
@@ -283,81 +283,6 @@
       </section>
 
       <section>
-          <h2>Instanced Drawing</h2>
-          <ul>
-              <li>
-                It's common to draw the same geometry multiple times while changing uniform values
-                <ul>
-                    <li>E.g. transform, color</li>
-                </ul>
-              </li>
-              <li>
-                  In WebGL 1, you have to iterate over each object and draw it individually
-              </li>
-              <li>
-                  In WebGL 2, you can draw objects that share geometry in a single draw call
-              </li>
-          </ul>
-      </section>
-
-      <section>
-        <h2>Instanced Drawing</h2>
-        <div>
-            In raw WebGL 2:
-        </div>
-            <pre>
-                <code class="javascript">
-  var positionBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER,  positionData, gl.STATIC_DRAW);
-  gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
-  gl.enableVertexAttribArray(0);
-  
-  var colorBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER,  colorData, gl.STATIC_DRAW);
-  gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
-  gl.enableVertexAttribArray(1);
-  gl.vertexAttribDivisor(1, 1);
-  
-  gl.drawArraysInstanced(gl.TRIANGLES, 0, numVertices, numInstances);
-              </code>
-            </pre>
-      </section>
-
-      <section>
-        <h2>Instanced Drawing</h2>
-        <div>
-            In PicoGl.js:
-        </div>
-            <pre>
-                <code class="javascript">
-  var positionBuffer = app.createVertexBuffer(PicoGL.FLOAT, 3, positionData);
-  var colorBuffer = app.createVertexBuffer(PicoGL.FLOAT, 3, colorData);
-  
-  var vertexArray = app.createVertexArray()
-  .vertexAttributeBuffer(0, positionBuffer)
-  .instanceAttributeBuffer(1, colorBuffer);
-
-  var drawCall = app.createDrawCall(program, vertexArray);
-  drawCall.draw();
-              </code>
-            </pre>
-      </section>
-
-      <section>
-          <h2>Instanced Drawing</h2>
-          <div>
-              Why do you care?
-          </div>
-          <ul>
-              <li>Reduced CPU overhead for drawing instances</li>
-              <li><a target="_blank" href="https://tsherif.github.io/picogl.js/examples/64kcubes.html">64,000 Cubes</a></li>
-              <li><a target="_blank" href="https://tsherif.github.io/picogl.js/examples/125kcubes.html">125,000 Cubes</a> (with transform feedback)</li>
-          </ul>
-      </section>
-
-      <section>
           <h2>Transform Feedback</h2>
           <ul>
             <li>
@@ -444,6 +369,81 @@
               <li>Major win for animations</li>
               <li><a target="_blank" href="https://tsherif.github.io/picogl.js/examples/particles.html">Particle System</a></li>
               <li><a target="_blank" href="https://tsherif.github.io/picogl.js/examples/wandering-triangles.html">Wandering Triangles</a></li>
+          </ul>
+      </section>
+
+      <section>
+          <h2>Instanced Drawing</h2>
+          <ul>
+              <li>
+                It's common to draw the same geometry multiple times while changing uniform values
+                <ul>
+                    <li>E.g. transform, color</li>
+                </ul>
+              </li>
+              <li>
+                  In WebGL 1, you have to iterate over each object and draw it individually
+              </li>
+              <li>
+                  In WebGL 2, you can draw objects that share geometry in a single draw call
+              </li>
+          </ul>
+      </section>
+
+      <section>
+        <h2>Instanced Drawing</h2>
+        <div>
+            In raw WebGL 2:
+        </div>
+            <pre>
+                <code class="javascript">
+  var positionBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER,  positionData, gl.STATIC_DRAW);
+  gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(0);
+  
+  var colorBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER,  colorData, gl.STATIC_DRAW);
+  gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(1);
+  gl.vertexAttribDivisor(1, 1);
+  
+  gl.drawArraysInstanced(gl.TRIANGLES, 0, numVertices, numInstances);
+              </code>
+            </pre>
+      </section>
+
+      <section>
+        <h2>Instanced Drawing</h2>
+        <div>
+            In PicoGl.js:
+        </div>
+            <pre>
+                <code class="javascript">
+  var positionBuffer = app.createVertexBuffer(PicoGL.FLOAT, 3, positionData);
+  var colorBuffer = app.createVertexBuffer(PicoGL.FLOAT, 3, colorData);
+  
+  var vertexArray = app.createVertexArray()
+  .vertexAttributeBuffer(0, positionBuffer)
+  .instanceAttributeBuffer(1, colorBuffer);
+
+  var drawCall = app.createDrawCall(program, vertexArray);
+  drawCall.draw();
+              </code>
+            </pre>
+      </section>
+
+      <section>
+          <h2>Instanced Drawing</h2>
+          <div>
+              Why do you care?
+          </div>
+          <ul>
+              <li>Reduced CPU overhead for drawing instances</li>
+              <li><a target="_blank" href="https://tsherif.github.io/picogl.js/examples/64kcubes.html">64,000 Cubes</a></li>
+              <li><a target="_blank" href="https://tsherif.github.io/picogl.js/examples/125kcubes.html">125,000 Cubes</a> (with transform feedback)</li>
           </ul>
       </section>
 
